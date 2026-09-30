@@ -1,0 +1,205 @@
+<!-- Header -->
+<header class="bg-blue-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice"></i> 2025년 민원 서비스 통합 검색
+            </h1>
+            <p class="text-blue-100 text-sm mt-1">국민이 원하는 민원 서비스를 쉽고 빠르게 찾아보세요.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium border border-blue-500">
+            총 등록 서비스: <span id="total-count" class="font-bold text-white">22</span>건
+        </div>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+    
+    <!-- Search & Filter Control Panel -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            
+            <!-- Keyword Search -->
+            <div class="md:col-span-7">
+                <label for="search-input" class="block text-sm font-medium text-slate-700 mb-1">서비스명 검색</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="search-input" placeholder="검색할 서비스명을 입력하세요 (예: 주민등록, 여권 등)" 
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="md:col-span-5">
+                <label for="category-select" class="block text-sm font-medium text-slate-700 mb-1">민원분야 필터</label>
+                <div class="relative">
+                    <select id="category-select" 
+                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        <option value="">전체 분야 보기</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Active Status & Reset -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500">
+            <div>
+                현재 표시 건수: <span id="filtered-count" class="font-bold text-blue-600 text-base">22</span>건 / 총 22건
+            </div>
+            <button id="reset-btn" class="mt-2 sm:mt-0 text-slate-600 hover:text-blue-600 font-medium flex items-center gap-1 transition">
+                <i class="fa-solid fa-rotate-right"></i> 검색 초기화
+            </button>
+        </div>
+    </div>
+
+    <!-- Service Table / Card Container -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">서비스명</th>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">소관기관</th>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">민원분야</th>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">온라인처리</th>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">처리기한</th>
+                        <th scope="col" class="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">수수료</th>
+                    </tr>
+                </thead>
+                <tbody id="service-table-body" class="divide-y divide-slate-200 bg-white">
+                    <!-- Dynamic Rows injected via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden p-12 text-center">
+            <div class="text-slate-400 text-4xl mb-3"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 class="text-lg font-medium text-slate-700">검색 결과가 없습니다</h3>
+            <p class="text-sm text-slate-500 mt-1">다른 검색어나 민원분야 필터를 선택해 주세요.</p>
+        </div>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-white border-t border-slate-200 mt-auto py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+        &copy; 2025 행정안전부 민원제도과. All rights reserved. (배포 유효기간: 1개월)
+    </div>
+</footer>
+
+<!-- JavaScript Logic -->
+<script>
+    const servicesData = [
+        { "서비스ID": "S001", "서비스명": "주민등록등본 발급", "소관기관": "주민센터", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 7, "수수료": 500 },
+        { "서비스ID": "S002", "서비스명": "전입신고", "소관기관": "복지정책과", "민원분야": "주민등록", "온라인처리": "불가", "처리기한일": 1, "수수료": 0 },
+        { "서비스ID": "S003", "서비스명": "인감증명 발급", "소관기관": "복지정책과", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 1, "수수료": 0 },
+        { "서비스ID": "S004", "서비스명": "주민등록증 재발급", "소관기관": "건축과", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 0, "수수료": 0 },
+        { "서비스ID": "S005", "서비스명": "건축물대장 발급", "소관기관": "구청 민원봉사과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 0, "수수료": 1000 },
+        { "서비스ID": "S006", "서비스명": "건축허가 신청", "소관기관": "건축과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 1, "수수료": 2000 },
+        { "서비스ID": "S007", "서비스명": "용도변경 신고", "소관기관": "시청 민원과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 0, "수수료": 0 },
+        { "서비스ID": "S008", "서비스명": "지방세 납부확인서", "소관기관": "건축과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 1, "수수료": 1000 },
+        { "서비스ID": "S009", "서비스명": "취득세 신고", "소관기관": "교통행정과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 0, "수수료": 0 },
+        { "서비스ID": "S010", "서비스명": "재산세 조회", "소관기관": "교통행정과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 3, "수수료": 0 },
+        { "서비스ID": "S011", "서비스명": "기초연금 신청", "소관기관": "건축과", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 7, "수수료": 500 },
+        { "서비스ID": "S012", "서비스명": "복지급여 조회", "소관기관": "시청 민원과", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 14, "수수료": 5000 },
+        { "서비스ID": "S013", "서비스명": "장애인 등록", "소관기관": "주민센터", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 5, "수수료": 0 },
+        { "서비스ID": "S014", "서비스명": "자동차 등록", "소관기관": "주민센터", "민원분야": "교통", "온라인처리": "가능", "처리기한일": 1, "수수료": 5000 },
+        { "서비스ID": "S015", "서비스명": "운전면허 갱신", "소관기관": "교통행정과", "민원분야": "교통", "온라인처리": "불가", "처리기한일": 1, "수수료": 0 },
+        { "서비스ID": "S016", "서비스명": "주정차 위반 조회", "소관기관": "주민센터", "민원분야": "교통", "온라인처리": "가능", "처리기한일": 7, "수수료": 1000 },
+        { "서비스ID": "S017", "서비스명": "배출시설 신고", "소관기관": "주민센터", "민원분야": "환경", "온라인처리": "가능", "처리기한일": 1, "수수료": 0 },
+        { "서비스ID": "S018", "서비스명": "폐기물 처리 신청", "소관기관": "시청 민원과", "민원분야": "환경", "온라인처리": "가능", "처리기한일": 14, "수수료": 5000 },
+        { "서비스ID": "S019", "서비스명": "식품영업 신고", "소관기관": "건축과", "민원분야": "위생", "온라인처리": "가능", "처리기한일": 3, "수수료": 2000 },
+        { "서비스ID": "S020", "서비스명": "위생업소 조회", "소관기관": "시청 민원과", "민원분야": "위생", "온라인처리": "불가", "처리기한일": 7, "수수료": 500 },
+        { "서비스ID": "S021", "서비스명": "여권 발급 신청", "소관기관": "건축과", "민원분야": "여권", "온라인처리": "가능", "처리기한일": 7, "수수료": 1000 },
+        { "서비스ID": "S022", "서비스명": "여권 재발급", "소관기관": "교통행정과", "민원분야": "여권", "온라인처리": "가능", "처리기한일": 1, "수수료": 1000 }
+    ];
+
+    const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('category-select');
+    const tableBody = document.getElementById('service-table-body');
+    const filteredCountEl = document.getElementById('filtered-count');
+    const emptyStateEl = document.getElementById('empty-state');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Initialize Categories Dropdown
+    function initCategories() {
+        const categories = [...new Set(servicesData.map(item => item.민원분야))];
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    // Render Table Rows
+    function renderTable(data) {
+        tableBody.innerHTML = '';
+        filteredCountEl.textContent = data.length;
+
+        if (data.length === 0) {
+            emptyStateEl.classList.remove('hidden');
+            return;
+        } else {
+            emptyStateEl.classList.add('hidden');
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition';
+
+            const isOnline = item.온라인처리 === '가능';
+            const onlineBadgeClass = isOnline 
+                ? 'bg-emerald-100 text-emerald-800' 
+                : 'bg-amber-100 text-amber-800';
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">${item.서비스명}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.소관기관}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                    <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium">${item.민원분야}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${onlineBadgeClass}">${item.온라인처리}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 text-center">${item.처리기한일}일</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 text-right font-medium">${item.수수료.toLocaleString()}원</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    // Filter Logic (Keyword + Category simultaneous application)
+    function filterServices() {
+        const keyword = searchInput.value.toLowerCase().trim();
+        const selectedCategory = categorySelect.value;
+
+        const filtered = servicesData.filter(item => {
+            const matchKeyword = item.서비스명.toLowerCase().includes(keyword);
+            const matchCategory = selectedCategory === "" || item.민원분야 === selectedCategory;
+            return matchKeyword && matchCategory;
+        });
+
+        renderTable(filtered);
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', filterServices);
+    categorySelect.addEventListener('change', filterServices);
+
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        categorySelect.value = '';
+        renderTable(servicesData);
+    });
+
+    // Initial Load
+    initCategories();
+    renderTable(servicesData);
+</script>
